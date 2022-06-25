@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_graph"
+    app:startDestination="@id/mainGridFragment">
+
+    <fragment
+        android:id="@+id/mainGridFragment"
+        android:name="com.example.wallpapercatalog.ui.fragments.MainGridFragment"
+        android:label="fragment_main_grid"
+        tools:layout="@layout/fragment_main_grid" >
+        <action
+            android:id="@+id/action_mainGridFragment_to_themeGridFragment"
+            app:destination="@id/themeGridFragment"/>
+
+    </fragment>
+    <fragment
+        android:id="@+id/themeGridFragment"
+        android:name="com.example.wallpapercatalog.ui.fragments.ThemeGridFragment"
+        android:label="fragment_theme_grid"
+        tools:layout="@layout/fragment_theme_grid">
+        <argument
+            android:name="themeId"
+            app:argType="integer"/>
+        <action
+            android:id="@+id/action_themeGridFragment_to_imagePreviewFragment"
+            app:destination="@id/imagePreviewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/imagePreviewFragment"
+        android:name="com.example.wallpapercatalog.ui.fragments.ImagePreviewFragment"
+        android:label="fragment_image_preview"
+        tools:layout="@layout/fragment_image_preview">
+        <argument
+            android:name="imageUrl"
+            app:argType="string"/>
+    </fragment>
+</navigation>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="wallpaper_detail_height">250dp</dimen>
+    <dimen name="grid_item_height">280dp</dimen>
+    <dimen name="grid_item_margin">6dp</dimen>
+    <dimen name="detail_view_margin">2dp</dimen>
+</resources>
