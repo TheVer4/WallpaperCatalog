@@ -1,12 +1,13 @@
 package com.example.wallpapercatalog
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -17,6 +18,7 @@ import com.example.wallpapercatalog.di.ViewModelFactory
 import com.example.wallpapercatalog.di.appComponent
 import com.example.wallpapercatalog.ui.viewModels.ActivityViewModel
 import javax.inject.Inject
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,10 +43,6 @@ class MainActivity : AppCompatActivity() {
 
         activityViewModel.appTheme.observe(this) {
             AppCompatDelegate.setDefaultNightMode(it)
-            val intent = this.intent
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-//            this.finish()
-//            startActivity(intent)
         }
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
@@ -59,6 +57,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.options_menu, menu)
+
+        with(menu?.findItem(R.id.settingsFragment)?.icon) {
+            val color = if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) com.google.android.material.R.color.design_default_color_on_secondary else com.google.android.material.R.color.design_default_color_on_primary
+            this?.let { DrawableCompat.wrap(it).setTint(ContextCompat.getColor(this@MainActivity, color)) }
+            menu?.findItem(R.id.settingsFragment)?.icon = this
+        }
         return true
     }
 

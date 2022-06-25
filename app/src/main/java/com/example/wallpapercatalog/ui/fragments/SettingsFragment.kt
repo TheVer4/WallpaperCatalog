@@ -23,14 +23,10 @@ class SettingsFragment : Fragment() {
     private val activityViewModel by viewModels<ActivityViewModel> { viewModelFactory }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-/*        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
-            activityViewModel.switchAppTheme(AppCompatDelegate.MODE_NIGHT_NO)
-        else
-            activityViewModel.switchAppTheme(AppCompatDelegate.MODE_NIGHT_YES)*/
 
-        binding.themeSwitch.isChecked = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
+        binding.themeSwitch.isChecked = AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_NO
         binding.themeSwitch.setOnClickListener {
-            activityViewModel.switchAppTheme(if(binding.themeSwitch.isChecked) AppCompatDelegate.MODE_NIGHT_NO else AppCompatDelegate.MODE_NIGHT_NO)
+            activityViewModel.switchAppTheme(if(binding.themeSwitch.isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
         }
 
         super.onViewCreated(view, savedInstanceState)
