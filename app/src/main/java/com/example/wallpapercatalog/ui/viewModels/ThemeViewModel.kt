@@ -20,10 +20,11 @@ class ThemeViewModel @Inject constructor(
 
     fun loadValues(themeId: Int) {
         viewModelScope.launch {
-            Log.d("MVM VMS", "Launched process of requesting data")
-            val contents: ThemeContents = getThemeContents(themeId)
-            val result = contents.toGridItems()
-            liveData.postValue(UiState.Success(result))
+            val contents: ThemeContents? = getThemeContents(themeId)
+            val result = contents?.toGridItems()
+            result?.let {
+                liveData.postValue(UiState.Success(result))
+            } ?: liveData.postValue(UiState.Error("Unreachable data"))
         }
     }
 }

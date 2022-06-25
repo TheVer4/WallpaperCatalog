@@ -1,5 +1,7 @@
 package com.example.wallpapercatalog.di
 
+import com.example.wallpapercatalog.domain.repository.CacheRepository
+import com.example.wallpapercatalog.domain.repository.CacheRepositoryImpl
 import com.example.wallpapercatalog.domain.repository.RemoteRepository
 import com.example.wallpapercatalog.domain.repository.RemoteRepositoryImpl
 import com.example.wallpapercatalog.domain.usecases.getThemeContents.GetThemeContents
@@ -14,6 +16,9 @@ interface AppBindModule {
 
     @Binds
     fun bindRemoteRepository(repository: RemoteRepositoryImpl): RemoteRepository
+
+    @Binds
+    fun bindCacheRepository(repository: CacheRepositoryImpl): CacheRepository
 
     @Binds
     fun bindGetThemeContentsUseCase(getThemeContents: GetThemeContentsImpl): GetThemeContents
