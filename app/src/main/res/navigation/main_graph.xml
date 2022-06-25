@@ -8,32 +8,40 @@
     <fragment
         android:id="@+id/mainGridFragment"
         android:name="com.example.wallpapercatalog.ui.fragments.MainGridFragment"
-        android:label="fragment_main_grid"
+        android:label="@string/main_fragment_label"
         tools:layout="@layout/fragment_main_grid" >
         <action
             android:id="@+id/action_mainGridFragment_to_themeGridFragment"
-            app:destination="@id/themeGridFragment"/>
+            app:destination="@id/themeGridFragment" />
 
     </fragment>
     <fragment
         android:id="@+id/themeGridFragment"
         android:name="com.example.wallpapercatalog.ui.fragments.ThemeGridFragment"
-        android:label="fragment_theme_grid"
+        android:label="{label}"
         tools:layout="@layout/fragment_theme_grid">
         <argument
             android:name="themeId"
-            app:argType="integer"/>
+            app:argType="integer" />
         <action
             android:id="@+id/action_themeGridFragment_to_imagePreviewFragment"
             app:destination="@id/imagePreviewFragment" />
+        <argument
+            android:name="label"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/imagePreviewFragment"
         android:name="com.example.wallpapercatalog.ui.fragments.ImagePreviewFragment"
-        android:label="fragment_image_preview"
+        android:label="@string/image_preview_label"
         tools:layout="@layout/fragment_image_preview">
         <argument
             android:name="imageUrl"
             app:argType="string"/>
     </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.wallpapercatalog.ui.fragments.SettingsFragment"
+        android:label="@string/settings_label"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

@@ -3,4 +3,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="set_wallpaper">Set wallpaper</string>
+    <string name="details_default_header">More in thematic</string>
+    <string name="image_preview_label">Image preview</string>
+    <string name="settings_label">Settings</string>
+    <string name="main_fragment_label">All thematics</string>
+    <string name="night_mode_switch">Night mode</string>
 </resources>

@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.wallpapercatalog.R
 import com.example.wallpapercatalog.databinding.FragmentMainGridBinding
 import com.example.wallpapercatalog.di.ViewModelFactory
 import com.example.wallpapercatalog.di.appComponent
@@ -60,7 +61,8 @@ class MainGridFragment : Fragment() {
 
         adapter.setOnItemClickListener { _, holder ->
             holder.item?.id?.let {
-                MainGridFragmentDirections.actionMainGridFragmentToThemeGridFragment(it).also { navDir ->
+                MainGridFragmentDirections.actionMainGridFragmentToThemeGridFragment(it, holder.item?.title ?: getString(
+                                    R.string.details_default_header)).also { navDir ->
                     findNavController().navigate(navDir)
                 }
             }
