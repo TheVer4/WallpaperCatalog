@@ -3,6 +3,7 @@ package com.example.wallpapercatalog.ui.fragments
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.WallpaperManager
+import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -14,8 +15,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.fragment.navArgs
 import com.example.wallpapercatalog.databinding.FragmentImagePreviewBinding
+import com.example.wallpapercatalog.di.appComponent
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import javax.inject.Inject
 
 class ImagePreviewFragment : Fragment() {
 
@@ -24,10 +27,18 @@ class ImagePreviewFragment : Fragment() {
     private val args: ImagePreviewFragmentArgs by navArgs()
     private var imageUrl: String? = null
 
+    @Inject
+    lateinit var picasso: Picasso
+
+    override fun onAttach(context: Context) {
+        context.appComponent.inject(this)
+        super.onAttach(context)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imageUrl = args.imageUrl
 
-        Picasso.with(requireContext())
+        picasso
             .load(imageUrl)
             .into(binding.wallpaperPreview)
 

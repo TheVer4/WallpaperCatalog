@@ -9,10 +9,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wallpapercatalog.R
 import com.example.wallpapercatalog.databinding.GridItemBinding
+import com.example.wallpapercatalog.di.appComponent
 import com.example.wallpapercatalog.ui.model.GridItem
+import com.squareup.picasso.Callback
+import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
+import javax.inject.Inject
 
-class WallpaperGridAdapter :
+class WallpaperGridAdapter() :
     ListAdapter<GridItem, WallpaperGridAdapter.ViewHolder>(GridItemDiffCallBack()) {
 
     var itemClickListener: ItemClickListener? = null
@@ -33,8 +37,15 @@ class WallpaperGridAdapter :
 
     class ThemePreviewViewHolder(
         private val binding: GridItemBinding,
-        private val context: Context,
+        context: Context,
     ) : ViewHolder(binding.root) {
+
+        @Inject
+        lateinit var picasso: Picasso
+
+        init {
+            context.appComponent.inject(this)
+        }
 
         override fun onBindItem(item: GridItem) {
             loadImage(item.imageUrl)
@@ -42,7 +53,7 @@ class WallpaperGridAdapter :
         }
 
         private fun loadImage(url: String) {
-            Picasso.with(context)
+            picasso
                 .load(url)
                 .into(binding.image)
         }
@@ -50,10 +61,14 @@ class WallpaperGridAdapter :
 
     class WallpaperDetailViewHolder(
         private val view: ImageView,
-        private val context: Context,
+        context: Context,
     ) : ViewHolder(view) {
 
+        @Inject
+        lateinit var picasso: Picasso
+
         init {
+            context.appComponent.inject(this)
             with(view) {
                 layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     resources.getDimensionPixelSize(
@@ -70,7 +85,7 @@ class WallpaperGridAdapter :
         }
 
         private fun loadImage(url: String) {
-            Picasso.with(context)
+            picasso
                 .load(url)
                 .into(view)
         }
