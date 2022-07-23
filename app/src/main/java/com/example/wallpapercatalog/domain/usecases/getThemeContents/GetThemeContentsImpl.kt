@@ -16,7 +16,7 @@ class GetThemeContentsImpl @Inject constructor(
             response = remoteRepository.getThemeContents(id)
             cacheRepository.storeThemeContents(ThemeContentsDbEntity.fromThemeContents(response))
         } catch (exception: Exception) {
-            response = cacheRepository.getThemeContents(1)?.toThemeContents() //TODO Hardcoded parameter cause mockapi returns only this value
+            response = cacheRepository.getThemeContents(id)?.toThemeContents() //TODO Hardcoded parameter cause mock-api returns only this value
         }
         return response
     }

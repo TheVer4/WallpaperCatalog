@@ -1,18 +1,16 @@
 package com.example.wallpapercatalog.ui.fragments
 
 import android.app.AlertDialog
-import android.app.Dialog
 import android.app.WallpaperManager
 import android.content.Context
-import android.content.DialogInterface
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.example.wallpapercatalog.databinding.FragmentImagePreviewBinding
 import com.example.wallpapercatalog.di.appComponent
@@ -56,12 +54,15 @@ class ImagePreviewFragment : Fragment() {
     }
 
     private fun setWallpaper(imageUrl: String) {
-        var wpBitmap: Bitmap? = null
+        var wpBitmap: Bitmap?
+        val wallpaperManager = WallpaperManager.getInstance(requireContext())
         Picasso.with(requireContext())
             .load(imageUrl)
             .into(object : Target {
                 override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                     wpBitmap = bitmap
+                    wallpaperManager.setBitmap(wpBitmap)
+                    Toast.makeText(requireContext(), "Wallpaper set!", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onBitmapFailed(errorDrawable: Drawable?) {
@@ -72,9 +73,6 @@ class ImagePreviewFragment : Fragment() {
 
                 }
             })
-        val wallpaperManager = WallpaperManager.getInstance(requireContext())
-        wallpaperManager.setBitmap(wpBitmap)
-        Toast.makeText(requireContext(), "Wallpaper set!", Toast.LENGTH_SHORT).show()
     }
 
 

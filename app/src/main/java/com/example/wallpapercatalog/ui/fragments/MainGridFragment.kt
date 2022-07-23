@@ -1,5 +1,6 @@
 package com.example.wallpapercatalog.ui.fragments
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,13 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.wallpapercatalog.MainActivity
 import com.example.wallpapercatalog.R
 import com.example.wallpapercatalog.databinding.FragmentMainGridBinding
 import com.example.wallpapercatalog.di.ViewModelFactory
 import com.example.wallpapercatalog.di.appComponent
 import com.example.wallpapercatalog.ui.adapters.WallpaperGridAdapter
 import com.example.wallpapercatalog.ui.model.UiState
-import com.example.wallpapercatalog.ui.viewModels.ActivityViewModel
 import com.example.wallpapercatalog.ui.viewModels.MainViewModel
 import javax.inject.Inject
 
@@ -27,12 +28,13 @@ class MainGridFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private val viewModel by viewModels<MainViewModel> { viewModelFactory }
-    private val activityViewModel by viewModels<ActivityViewModel> { viewModelFactory }
+    private var activity: Activity? = null
 
     private val adapter = WallpaperGridAdapter()
 
     override fun onAttach(context: Context) {
         context.appComponent.inject(this)
+        activity = if (requireActivity() is MainActivity) requireActivity() else null
         super.onAttach(context)
     }
 
@@ -53,7 +55,7 @@ class MainGridFragment : Fragment() {
 
         viewModel.liveData.observe(viewLifecycleOwner) {
             it ?: return@observe
-            activityViewModel.showProgressBar(it is UiState.Loading)
+            (activity as? MainActivity)?.showProgressBar(it is UiState.Loading)
 
             if(it is UiState.Success)
                 adapter.submitList(it.value)

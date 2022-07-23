@@ -5,9 +5,13 @@ import androidx.room.TypeConverter
 class DataConverter {
     @TypeConverter
     fun fromListToString(list: List<String>): String =
-        list.joinToString(separator = "^")
+        list.joinToString(separator = SEPARATOR.toString())
 
     @TypeConverter
     fun fromStringToList(str: String): List<String> =
-        str.split('^')
+        str.split(SEPARATOR)
+
+    companion object {
+        private const val SEPARATOR = '^'
+    }
 }
