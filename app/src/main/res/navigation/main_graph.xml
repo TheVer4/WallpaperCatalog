@@ -29,6 +29,9 @@
         <argument
             android:name="label"
             app:argType="string" />
+        <action
+            android:id="@+id/action_themeGridFragment_to_multipleImagesInstallerFragment"
+            app:destination="@id/multipleImagesInstallerFragment" />
     </fragment>
     <fragment
         android:id="@+id/imagePreviewFragment"
@@ -44,4 +47,13 @@
         android:name="com.example.wallpapercatalog.ui.fragments.SettingsFragment"
         android:label="@string/settings_label"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/multipleImagesInstallerFragment"
+        android:name="com.example.wallpapercatalog.ui.fragments.MultipleImagesInstallerFragment"
+        android:label="@string/fragment_multiple_images_installer_label"
+        tools:layout="@layout/fragment_multiple_images_installer">
+        <argument
+            android:name="selectedItems"
+            app:argType="com.example.wallpapercatalog.ui.model.GridItems"/>
+    </fragment>
 </navigation>

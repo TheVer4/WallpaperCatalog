@@ -8,4 +8,7 @@
     <string name="settings_label">Settings</string>
     <string name="main_fragment_label">All thematics</string>
     <string name="night_mode_switch">Night mode</string>
+    <string name="wallpaper">wallpaper</string>
+    <string name="continue_with_selected_button">Continue with selected</string>
+    <string name="fragment_multiple_images_installer_label">Set as wallpaper series</string>
 </resources>

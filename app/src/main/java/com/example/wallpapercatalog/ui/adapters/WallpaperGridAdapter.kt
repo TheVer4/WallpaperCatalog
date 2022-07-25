@@ -4,28 +4,29 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.wallpapercatalog.R
 import com.example.wallpapercatalog.databinding.GridItemBinding
+import com.example.wallpapercatalog.databinding.SelectableImageViewBinding
 import com.example.wallpapercatalog.di.appComponent
 import com.example.wallpapercatalog.ui.model.GridItem
-import com.squareup.picasso.Callback
-import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
-class WallpaperGridAdapter() :
+class WallpaperGridAdapter :
     ListAdapter<GridItem, WallpaperGridAdapter.ViewHolder>(GridItemDiffCallBack()) {
 
-    var itemClickListener: ItemClickListener? = null
+    private var itemClickListener: ItemClickListener? = null
+    private var itemLongClickListener: ItemClickListener? = null
+    private var isMultiSelectModeEnabled: Boolean = false
+    private val viewHolders: MutableList<ViewHolder> = mutableListOf()
+    private var onMultiSelectionModeChangedListener: OnMultiSelectionModeChangedListener? = null
 
     abstract class ViewHolder(view: View) :
         RecyclerView.ViewHolder(view) {
 
         var item: GridItem? = null
-            protected set
+            private set
 
         fun bind(item: GridItem) {
             this.item = item
@@ -36,7 +37,7 @@ class WallpaperGridAdapter() :
     }
 
     class ThemePreviewViewHolder(
-        private val binding: GridItemBinding,
+        val binding: GridItemBinding,
         context: Context,
     ) : ViewHolder(binding.root) {
 
@@ -60,58 +61,106 @@ class WallpaperGridAdapter() :
     }
 
     class WallpaperDetailViewHolder(
-        private val view: ImageView,
+        val binding: SelectableImageViewBinding,
         context: Context,
-    ) : ViewHolder(view) {
+    ) : ViewHolder(binding.root) {
 
         @Inject
         lateinit var picasso: Picasso
 
         init {
             context.appComponent.inject(this)
-            with(view) {
-                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    resources.getDimensionPixelSize(
-                        R.dimen.wallpaper_detail_height))
-                scaleType = ImageView.ScaleType.CENTER_CROP
-                val margin = resources.getDimensionPixelSize(R.dimen.detail_view_margin)
-                layoutParams = ViewGroup.MarginLayoutParams(layoutParams)
-                (layoutParams as ViewGroup.MarginLayoutParams).setMargins(margin, margin, margin, margin)
-            }
         }
 
         override fun onBindItem(item: GridItem) {
             loadImage(item.imageUrl)
+            binding.checkbox.isChecked = item.selected
         }
 
         private fun loadImage(url: String) {
             picasso
                 .load(url)
-                .into(view)
+                .into(binding.detailImage)
         }
+
+        fun showCheckbox(show: Boolean = true) {
+            val viewVisibilityState = if(show) View.VISIBLE else View.GONE
+            binding.checkbox.visibility = viewVisibilityState
+        }
+
+        fun switchItemSelection() {
+            item?.let { it.selected = it.selected.not() }
+            binding.checkbox.isChecked = item?.selected ?: false
+        }
+
+        fun getItemSelectionState(): Boolean =
+            item?.selected ?: false
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return when (viewType) {
+        val viewHolder: ViewHolder = when (viewType) {
             THEME_PREVIEW_VIEW_TYPE -> {
                 val binding =
                     GridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 ThemePreviewViewHolder(binding, parent.context)
             }
             WALLPAPER_DETAIL_VIEW_TYPE -> {
-                val view = ImageView(parent.context)
-                WallpaperDetailViewHolder(view, parent.context)
+                val binding =
+                    SelectableImageViewBinding.inflate(LayoutInflater.from(parent.context),
+                        parent,
+                        false)
+                WallpaperDetailViewHolder(binding, parent.context).also {
+                    it.showCheckbox(isMultiSelectModeEnabled)
+                }
             }
             else -> throw Exception("Unexpected viewType at ${this::class.simpleName}")
         }
-
+        viewHolders.add(viewHolder)
+        return viewHolder
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val gridItem: GridItem = currentList[position]
         holder.bind(gridItem)
         holder.itemView.setOnClickListener {
-            itemClickListener?.onItemClick(it, holder)
+            if (isMultiSelectModeEnabled.not()) {
+                itemClickListener?.onItemClick(it, holder)
+            } else {
+                when(getItemViewType(position)) {
+                    WALLPAPER_DETAIL_VIEW_TYPE -> {
+                        (holder as WallpaperDetailViewHolder).switchItemSelection()
+                        if(isAnyTileSelected().not()) {
+                            switchMultiSelectMode()
+                        }
+                    }
+                }
+            }
+        }
+        holder.itemView.setOnLongClickListener {
+            when(getItemViewType(position)) {
+                WALLPAPER_DETAIL_VIEW_TYPE -> {
+                    switchMultiSelectMode()
+                    (holder as WallpaperDetailViewHolder).switchItemSelection()
+                }
+            }
+            itemLongClickListener?.onItemClick(it, holder)
+            true
+        }
+
+    }
+
+    private fun isAnyTileSelected(): Boolean =
+        currentList.any { it.selected }
+
+    private fun switchMultiSelectMode() {
+        isMultiSelectModeEnabled = isMultiSelectModeEnabled.not()
+        onMultiSelectionModeChangedListener?.onMultiSelectionModeChanged(isMultiSelectModeEnabled)
+        viewHolders.forEach { viewHolder ->
+            when(viewHolder.itemViewType) {
+                WALLPAPER_DETAIL_VIEW_TYPE -> {
+                    (viewHolder as WallpaperDetailViewHolder).showCheckbox(isMultiSelectModeEnabled)
+                }
+            }
         }
     }
 
@@ -122,9 +171,25 @@ class WallpaperGridAdapter() :
         this.itemClickListener = listener
     }
 
+    fun setOnItemLongClickListener(listener: ItemClickListener) {
+        this.itemLongClickListener = listener
+    }
+
+    fun setOnMultiSelectionModeChangedListener(listener: OnMultiSelectionModeChangedListener) {
+        onMultiSelectionModeChangedListener = listener
+    }
+
     companion object {
         const val THEME_PREVIEW_VIEW_TYPE = 1
         const val WALLPAPER_DETAIL_VIEW_TYPE = 2
+    }
+
+    fun interface ItemClickListener {
+        fun onItemClick(view: View?, holder: ViewHolder)
+    }
+
+    fun interface OnMultiSelectionModeChangedListener {
+        fun onMultiSelectionModeChanged(state: Boolean)
     }
 
 }

@@ -9,11 +9,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.example.wallpapercatalog.databinding.FragmentImagePreviewBinding
 import com.example.wallpapercatalog.di.appComponent
+import com.example.wallpapercatalog.di.showLongToast
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import javax.inject.Inject
@@ -62,7 +62,7 @@ class ImagePreviewFragment : Fragment() {
                 override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                     wpBitmap = bitmap
                     wallpaperManager.setBitmap(wpBitmap)
-                    Toast.makeText(requireContext(), "Wallpaper set!", Toast.LENGTH_SHORT).show()
+                    requireContext().showLongToast("Wallpaper set!")
                 }
 
                 override fun onBitmapFailed(errorDrawable: Drawable?) {

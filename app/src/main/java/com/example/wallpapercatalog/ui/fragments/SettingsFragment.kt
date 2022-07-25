@@ -17,15 +17,9 @@ class SettingsFragment : Fragment() {
 
     private var activity: Activity? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-        binding.themeSwitch.isChecked =
-            AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_NO
-        binding.themeSwitch.setOnClickListener {
-            (activity as? MainActivity)?.switchAppTheme(if (binding.themeSwitch.isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
-        }
-
-        super.onViewCreated(view, savedInstanceState)
+    override fun onAttach(context: Context) {
+        activity = if (requireActivity() is MainActivity) requireActivity() else null
+        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -36,9 +30,18 @@ class SettingsFragment : Fragment() {
         return binding.root
     }
 
-    override fun onAttach(context: Context) {
-        activity = if (requireActivity() is MainActivity) requireActivity() else null
-        super.onAttach(context)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        binding.themeSwitch.isChecked =
+            AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_NO
+        binding.themeSwitch.setOnClickListener {
+            val state =
+                if (binding.themeSwitch.isChecked) AppCompatDelegate.MODE_NIGHT_YES
+                else AppCompatDelegate.MODE_NIGHT_NO
+            (activity as? MainActivity)?.switchAppTheme(state)
+        }
+
+        super.onViewCreated(view, savedInstanceState)
     }
 
 }

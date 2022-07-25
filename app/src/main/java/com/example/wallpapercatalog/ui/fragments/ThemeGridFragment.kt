@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -16,7 +15,9 @@ import com.example.wallpapercatalog.MainActivity
 import com.example.wallpapercatalog.databinding.FragmentThemeGridBinding
 import com.example.wallpapercatalog.di.ViewModelFactory
 import com.example.wallpapercatalog.di.appComponent
+import com.example.wallpapercatalog.di.showLongToast
 import com.example.wallpapercatalog.ui.adapters.WallpaperGridAdapter
+import com.example.wallpapercatalog.ui.model.GridItems
 import com.example.wallpapercatalog.ui.model.UiState
 import com.example.wallpapercatalog.ui.viewModels.ThemeViewModel
 import javax.inject.Inject
@@ -48,8 +49,10 @@ class ThemeGridFragment : Fragment() {
             viewModel.loadValues(it)
         }
 
-        binding.themeRecycler.adapter = adapter
-        binding.themeRecycler.layoutManager = GridLayoutManager(requireContext(), 3)
+        with(binding.themeRecycler) {
+            this.adapter = this@ThemeGridFragment.adapter
+            this.layoutManager = GridLayoutManager(requireContext(), 3)
+        }
 
         viewModel.liveData.observe(viewLifecycleOwner) {
             it ?: return@observe
@@ -59,17 +62,32 @@ class ThemeGridFragment : Fragment() {
                 is UiState.Success -> adapter.submitList(it.value)
                 is UiState.Error -> {
                     (activity as? MainActivity)?.showProgressBar(false)
-                    Toast.makeText(requireContext(), it.msg, Toast.LENGTH_LONG).show()
+                    requireContext().showLongToast(it.msg)
                 }
                 else -> return@observe
             }
         }
 
-        adapter.setOnItemClickListener { _, holder ->
-            holder.item?.imageUrl?.let {
-                ThemeGridFragmentDirections.actionThemeGridFragmentToImagePreviewFragment(it).also { navDir ->
-                    findNavController().navigate(navDir)
+        with(adapter) {
+            setOnItemClickListener { _, holder ->
+                holder.item?.imageUrl?.let {
+                    ThemeGridFragmentDirections.actionThemeGridFragmentToImagePreviewFragment(it).also { navDir ->
+                        findNavController().navigate(navDir)
+                    }
                 }
+            }
+
+            setOnMultiSelectionModeChangedListener { state ->
+                binding.continueWithSelectedButton.visibility = if(state) View.VISIBLE else View.GONE
+            }
+        }
+
+        binding.continueWithSelectedButton.setOnClickListener {
+            val items = (viewModel.liveData.value as? UiState.Success)?.value
+            val gridItems = GridItems()
+            items?.filter { it.selected }?.let { it1 -> gridItems.addAll(it1) }
+            ThemeGridFragmentDirections.actionThemeGridFragmentToMultipleImagesInstallerFragment(gridItems).also { navDir ->
+                findNavController().navigate(navDir)
             }
         }
 
